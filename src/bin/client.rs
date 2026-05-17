@@ -8,14 +8,13 @@ use tokio_websockets::{ClientBuilder, Message};
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let (mut ws_stream, _) =
-        ClientBuilder::from_uri(Uri::from_static("ws://127.0.0.1:2000"))
+        ClientBuilder::from_uri(Uri::from_static("ws://127.0.0.1:8080"))
             .connect()
             .await
             .map_err(|err| -> Box<dyn Error + Send + Sync> { Box::new(err) })?;
 
     let stdin = tokio::io::stdin();
     let mut stdin = BufReader::new(stdin).lines();
-
     loop {
         tokio::select! {
             line_result = stdin.next_line() => {
