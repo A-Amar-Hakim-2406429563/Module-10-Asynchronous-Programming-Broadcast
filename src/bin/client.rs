@@ -2,6 +2,7 @@ use futures_util::SinkExt;
 use futures_util::stream::StreamExt;
 use http::Uri;
 use std::error::Error;
+use std::env;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio_websockets::{ClientBuilder, Message};
 
@@ -15,6 +16,8 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let stdin = tokio::io::stdin();
     let mut stdin = BufReader::new(stdin).lines();
+    let client_label = env::var("HOSTNAME").unwrap_or_else(|_| "Client".to_string());
+
     loop {
         tokio::select! {
             line_result = stdin.next_line() => {
@@ -32,7 +35,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                 match maybe_msg {
                     Some(Ok(msg)) if msg.is_text() => {
                         if let Some(text) = msg.as_text() {
-                            println!("From server: {text}");
+                            println!("{client_label} - From server: {text}");
                         }
                     }
                     Some(Ok(msg)) if msg.is_close() => break,
